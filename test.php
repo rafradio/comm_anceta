@@ -65,7 +65,7 @@
           die("Connection failed: " . $conn->connect_error);
         }
 
-        $rBegin = '<input type="checkbox" id="all" name="all" value="all">';
+        $rBegin = '<input type="checkbox" id="all" name="all" class="id_wave_checkbox" value="all" onchange="setAll(this);">';
         $rBegin .= '<label for="all"> - Все - </label><br><br>';
         echo $rBegin;
         $_label = "id_wave";
@@ -73,15 +73,14 @@
         
         // Отсюда идет вставка  Отсюда идет вставка  Отсюда идет вставка  Отсюда идет вставка
         
-        $sql1 = "SELECT *
-            FROM efes.wave_indicator;";
-        $result1 = $conn->query($sql1);
+        $sql1 = "SELECT * FROM efes.wave_indicator;";   // Заменить методом в lists_queries.php
+        $result1 = $conn->query($sql1);                 // 
         $rows1 = [];
         if ($result1->num_rows > 0) {
             while($row = $result1->fetch_assoc()) {
                 $rows1[] = $row;
             }
-        }
+        }  // Заменить методом в lists_queries.php
         
         $waves = [];
         foreach ($rows1 as $row) {
@@ -91,17 +90,22 @@
                 }
             }
         }
+        $testElement = $waves["Test"];
+        unset($waves["Test"]);
+        krsort($waves);
+        $waves["Test"] = $testElement;
+
 
         $indicatorNumber = 1;
-        foreach (array_keys($waves) as $keys) {
+        foreach (array_keys($waves) as $key) {
             $r = '<div class="category-name" >';
-            $r .= $keys;
+            $r .= $key;
             $r .= '</div>';
             $r .= '<div class="category-details">';
-            $r .= '<input type="checkbox" id="all_' . $indicatorNumber . '" name="all_' . $indicatorNumber . '" value="all_' . $indicatorNumber . '">';
+            $r .= '<input type="checkbox" id="all_' . $indicatorNumber . '" name="all_' . $indicatorNumber . '" value="all_' . $indicatorNumber . '" onchange="setAllIndicator(this);">';
             $r .= '<label for=all_' . $indicatorNumber . '>- Все -</label><br>';
-            foreach ($waves[$keys] as $row) {
-                $r .= '<input type="checkbox"' . getChecked($_label, $row['id']). 'class="' . $_label . '_checkbox" id="' . $_label . '_'. $row['id'] . '" name="' . $_label . '[]" value="' .  $row ['id'] . '" onChange="" />'. PHP_EOL;
+            foreach ($waves[$key] as $row) {
+                $r .= '<input type="checkbox"' . getChecked($_label, $row['id']). 'class="' . $_label . '_checkbox" id="' . $_label . '_'. $row['id'] . '" name="' . $_label . '[]" value="' .  $row ['id'] . '" onChange="">'. PHP_EOL;
                 $r .= '<label for="' . $_label . '_'. $row['id'] . '">' . $row["name"] . '</label><br>';
             }
             $r .= '</div>';
@@ -110,6 +114,8 @@
         }
 
         // вставка закончилась
+        
+        
         $keysToDict = array("2020", "2021", "2022", "2023", "2024", "2024", "Test");
         $conn->close();
         function getChecked($name, $val) {
@@ -123,8 +129,37 @@
         categoryName.forEach((el, index) => {
             el.onclick = () => {
                 categoryDetails[index].classList.toggle("category-details-up");
-            }
+            };
         });
+        function setAllIndicator(o) {
+            let v = o.checked;
+            o.parentNode.childNodes.forEach((el, index) => {
+                if (el.nodeName == "INPUT") {
+                    el.checked=v;
+                }
+            });
+        };
+        
+        
+        function setAll(o) {
+            v =o.checked;
+            nn=o.id;
+//            console.log(o.parentNode);
+//            let classArr = o.className.split(" ");
+//            console.log(Array.isArray(classArr));
+//            console.log(classArr[0]);
+//            let className = classArr.length > 1 ? classArr[1] : classArr[0];
+            let cb = document.getElementsByClassName(o.className);
+            nn = o.name;
+            nn = nn.substr(0,nn.length-2);
+            i=0;
+            for (let e of cb) {
+                e.checked=v;
+                i++;
+            }
+
+        }
+        
     </script>
 </body>
 </html>
