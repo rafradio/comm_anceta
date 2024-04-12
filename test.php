@@ -44,10 +44,14 @@
         // Create connection
         $conn = new mysqli($servername, $username, $password, $dbname);
         $conn->set_charset('utf8');
-        $sql = "SELECT w.id, w.name, w.indicator_id, i.`name` as attr
+//        $sql = "SELECT w.id, w.name, w.indicator_id, i.`name` as attr
+//            FROM efes.wave AS w
+//            JOIN wave_indicator AS i ON w.indicator_id=i.id
+//            WHERE w.project_id=17;";
+        $sql = "SELECT *
             FROM efes.wave AS w
-            JOIN wave_indicator AS i ON w.indicator_id=i.id
             WHERE w.project_id=17;";
+        
         $result = $conn->query($sql);
         $rows = [];
         if ($result->num_rows > 0) {
@@ -55,7 +59,7 @@
                 $rows[] = $row;
             }
         }
-
+        
         // Check connection
         if ($conn->connect_error) {
           die("Connection failed: " . $conn->connect_error);
@@ -67,12 +71,27 @@
         $_label = "id_wave";
         $_style = '';
         
-        // Отсюда идет вставка
+        // Отсюда идет вставка  Отсюда идет вставка  Отсюда идет вставка  Отсюда идет вставка
+        
+        $sql1 = "SELECT *
+            FROM efes.wave_indicator;";
+        $result1 = $conn->query($sql1);
+        $rows1 = [];
+        if ($result1->num_rows > 0) {
+            while($row = $result1->fetch_assoc()) {
+                $rows1[] = $row;
+            }
+        }
         
         $waves = [];
-        foreach ($rows as $row) {
-            $waves[$row["attr"]][] = $row;
+        foreach ($rows1 as $row) {
+            foreach ($rows as $finalRow) {
+                if ($finalRow['indicator_id'] == $row['id']) {
+                    $waves[$row['name']][] = $finalRow;
+                }
+            }
         }
+
         $indicatorNumber = 1;
         foreach (array_keys($waves) as $keys) {
             $r = '<div class="category-name" >';
