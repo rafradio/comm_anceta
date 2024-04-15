@@ -30,7 +30,7 @@
 </head>
 <body>
     <?php
-        
+        require_once ('SeconfPartFormat.php');
         $dataDB = [];
         $input = fopen("config.txt", "r");
         while(!feof($input)) { 
@@ -65,62 +65,49 @@
           die("Connection failed: " . $conn->connect_error);
         }
 
-        $rBegin = '<input type="checkbox" id="all" name="all" class="id_wave_checkbox" value="all" onchange="setAll(this);">';
-        $rBegin .= '<label for="all"> - Все - </label><br><br>';
-        echo $rBegin;
+//        $rBegin = '<input type="checkbox" id="all" name="all" class="id_wave_checkbox" value="all" onchange="setAll(this);">';
+//        $rBegin .= '<label for="all"> - Все - </label><br><br>';
+//        echo $rBegin;
         $_label = "id_wave";
         $_style = '';
+        $r = '';
         
         // Отсюда идет вставка  Отсюда идет вставка  Отсюда идет вставка  Отсюда идет вставка
         
-        $sql1 = "SELECT * FROM efes.wave_indicator;";   // Заменить методом в lists_queries.php
-        $result1 = $conn->query($sql1);                 // 
+        $sql1 = "SELECT * FROM efes.wave_indicator;";   // Заменить параметром передающимся в функцию  drawCheckboxesWaves()
+        $result1 = $conn->query($sql1);                 // Заменить методом в lists_queries.php
         $rows1 = [];
         if ($result1->num_rows > 0) {
             while($row = $result1->fetch_assoc()) {
                 $rows1[] = $row;
             }
-        }  // Заменить методом в lists_queries.php
+        }  // Заменить методом в lists_queries.php и получить $rows1
         
-        $waves = [];
-        foreach ($rows1 as $row) {
-            foreach ($rows as $finalRow) {
-                if ($finalRow['indicator_id'] == $row['id']) {
-                    $waves[$row['name']][] = $finalRow;
-                }
-            }
-        }
-        $testElement = $waves["Test"];
-        unset($waves["Test"]);
-        krsort($waves);
-        $waves["Test"] = $testElement;
-
-
-        $indicatorNumber = 1;
-        foreach (array_keys($waves) as $key) {
-            $r = '<div class="category-name" >';
-            $r .= $key;
-            $r .= '</div>';
-            $r .= '<div class="category-details">';
-            $r .= '<input type="checkbox" id="all_' . $indicatorNumber . '" name="all_' . $indicatorNumber . '" value="all_' . $indicatorNumber . '" onchange="setAllIndicator(this);">';
-            $r .= '<label for=all_' . $indicatorNumber . '>- Все -</label><br>';
-            foreach ($waves[$key] as $row) {
-                $r .= '<input type="checkbox"' . getChecked($_label, $row['id']). 'class="' . $_label . '_checkbox" id="' . $_label . '_'. $row['id'] . '" name="' . $_label . '[]" value="' .  $row ['id'] . '" onChange="">'. PHP_EOL;
-                $r .= '<label for="' . $_label . '_'. $row['id'] . '">' . $row["name"] . '</label><br>';
-            }
-            $r .= '</div>';
-            echo $r;
-            $indicatorNumber += 1;
-        }
+        echo drawCheckboxesWaves($rows, 'id_wave', 'Волна', true, $rows1);
+        
 
         // вставка закончилась
         
         
-        $keysToDict = array("2020", "2021", "2022", "2023", "2024", "2024", "Test");
+        
+        
+        
+        // Вторая часть задачи с questionnaire
+        
+        drawCheckboxesFormat($conn);
+        
+        // конец второй части
+        
         $conn->close();
+        
         function getChecked($name, $val) {
             $r='';
             return ($r);
+        }
+        function getProjectListFilter($params) {
+            $db=$params[1];
+            $q="select * from efes.wave_indicator ";
+            return($db->read($q)) ;
         }
     ?> 
     <script>
