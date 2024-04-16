@@ -1,13 +1,13 @@
 <?php
     function drawCheckboxesWaves($rows, $_label, $title, $expose_on_start, $rows1) {
         $rStart='
-    <div style="padding:5px; 
-    border: 1px solid #CCC;
-    border-radius: 4px;
-    box-sizing: border-box;" >
+        <div style="padding:5px; 
+        border: 1px solid #CCC;
+        border-radius: 4px;
+        box-sizing: border-box;" >
         <div style="padding:5px; border:0px; margin-top:5px; display: ' . $expose_on_start  . '" class="hidden_links" > <a href="" onClick="showonoff(\'' .$_label . '_block\'); return(false);"> ' . $title . '</a> 
-<span id="' . $_label  . '_counter">' . '</span>
-</div>
+        <span id="' . $_label  . '_counter">' . '</span>
+        </div>
 
         <div style="padding:5px; border:0px; display: ' . $expose_on_start  . '" id="' . $_label. '_block" >
             <input  type="checkbox" ' . getChecked($_label, 'all'). 'class="' . $_label . '_checkbox" id="' . $_label . '_all" name="' . $_label . '[]" value="all" onChange="setAll(this);" /> <label for="' . $_label . '_all" style="color: #aa6666;">- Все -</label><br><br>'. PHP_EOL;
@@ -29,8 +29,8 @@
             $r .= $key;
             $r .= '</div>';
             $r .= '<div class="category-details">';
-            $r .= '<input type="checkbox" id="all_' . $indicatorNumber . '" name="all_' . $indicatorNumber . '" value="all_' . $indicatorNumber . '" onchange="setAllIndicator(this);">';
-            $r .= '<label for=all_' . $indicatorNumber . '>- Все -</label><br>';
+            $r .= '<input type="checkbox" id="all_waves_' . $indicatorNumber . '" name="all_waves_' . $indicatorNumber . '" value="all_waves_' . $indicatorNumber . '" onchange="setAllIndicator(this);">';
+            $r .= '<label for=all_waves_' . $indicatorNumber . '>- Все -</label><br>';
             foreach ($waves[$key] as $row) {
                 $r .= '<input type="checkbox"' . getChecked($_label, $row['id']). 'class="' . $_label . '_checkbox" id="' . $_label . '_'. $row['id'] . '" name="' . $_label . '[]" value="' .  $row ['id'] . '" onChange="">'. PHP_EOL;
                 $r .= '<label for="' . $_label . '_'. $row['id'] . '">' . $row["name"] . '</label><br>';
@@ -39,23 +39,64 @@
             $rStart .= $r;
             $indicatorNumber += 1;
         }
+        $rStart .= '
+            </div>
+
+            </div>
+        ';
         return $rStart;
     }
     
-    function drawCheckboxesFormat($conn) {
-        $rBegin = '<input type="checkbox" id="all_projects" name="all" class="id_project_checkbox" value="all" onchange="setAll(this);">';
-        $rBegin .= '<label for="all_projects"> - Все - </label><br><br>';
-        echo 'Формат<br><br>';
-        echo $rBegin;
-        $sql1 = "select * from efes.questionnaire where project_id = 17 "  . "
-             &&  ( hidden_on_web= 0 || hidden_on_web is null ) ";
-        $result = $conn->query($sql1);
-        $rows = [];
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                $rows[] = $row;
+    function drawCheckboxesFormat($rows, $_label, $title, $expose_on_start) {
+        $rStart='
+            <div style="padding:5px; 
+            border: 1px solid #CCC;
+            border-radius: 4px;
+            box-sizing: border-box;" >
+                <div style="padding:5px; border:0px; margin-top:5px; display: ' . $expose_on_start  . '" class="hidden_links" > <a href="" onClick="showonoff(\'' .$_label . '_block\'); return(false);"> ' . $title . '</a> 
+        <span id="' . $_label  . '_counter">' . '</span>
+        </div>
+
+                <div style="padding:5px; border:0px; display: ' . $expose_on_start  . '" id="' . $_label. '_block" >
+                    <input  type="checkbox" ' . getChecked($_label, 'all'). 'class="' . $_label . '_checkbox" id="' . $_label . '_all" name="' . $_label . '[]" value="all" onChange="setAllIndicator(this);;" /> <label for="' . $_label . '_all" style="color: #aa6666;">- Все -</label><br><br>'. PHP_EOL;
+        $waves = [];
+        foreach ($rows as $row) {
+            $waves[$row['current']][] = $row;
+        }
+        krsort($waves);
+        $indicatorNumber = 1;
+        $rOld = '<div class="category-name" >';
+        $rOld .= "Старые форматы";
+        $rOld .= '</div>';
+        $rOld .= '<div class="category-details">';
+        $rOld .= '<input type="checkbox" id="all_format_' . $indicatorNumber . '" name="all_format_' . $indicatorNumber . '" value="all_format_' . $indicatorNumber . '" onchange="setAllIndicator(this);">';
+        $rOld .= '<label for=all_format_' . $indicatorNumber . '>- Все -</label><br>';
+        foreach (array_keys($waves) as $key) {
+            
+            if ($key == '2') {
+                foreach ($waves[$key] as $row) {
+                    $r = '<input type="checkbox"' . getChecked($_label, $row['id']). 'class="' . $_label . '_checkbox" id="' . $_label . '_'. $row['id'] . '" name="' . $_label . '[]" value="' .  $row ['id'] . '" onChange="">'. PHP_EOL;
+                    $r .= '<label for="' . $_label . '_'. $row['id'] . '">' . $row["name"] . '</label><br>';
+                    $rStart .= $r;
+                }
+                $rStart .= "<br><br>";
+            } else {
+                foreach ($waves[$key] as $row) {
+                    $rOld .= '<input type="checkbox"' . getChecked($_label, $row['id']). 'class="' . $_label . '_checkbox" id="' . $_label . '_'. $row['id'] . '" name="' . $_label . '[]" value="' .  $row ['id'] . '" onChange="">'. PHP_EOL;
+                    $rOld .= '<label for="' . $_label . '_'. $row['id'] . '">' . $row["name"] . '</label><br>';
+                }
+                $indicatorNumber += 1;
             }
         }
+        $rOld .= '</div>';
+        $rStart .= $rOld;
+        $rStart .= '
+            </div>
+
+            </div>
+        ';
+        return $rStart;
+        
     }
     
 ?>
