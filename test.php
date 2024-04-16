@@ -89,12 +89,20 @@
         // вставка закончилась
         
         
-        
+        $sql1 = "select * from efes.questionnaire where project_id = 17 "  . "
+             &&  ( hidden_on_web= 0 || hidden_on_web is null ) ";
+        $result = $conn->query($sql1);
+        $rows = [];
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $rows[] = $row;
+            }
+        }
         
         
         // Вторая часть задачи с questionnaire
         
-        drawCheckboxesFormat($conn);
+        echo drawCheckboxesFormat($rows, 'id_project', 'Формат', true);
         
         // конец второй части
         
@@ -145,6 +153,14 @@
                 i++;
             }
 
+        }
+        function showonoff(v) {
+            if (document.getElementById(v).style.display=="") {
+                document.getElementById(v).style.display="none";
+            }
+            else {
+                document.getElementById(v).style.display="";
+            }
         }
         
     </script>
