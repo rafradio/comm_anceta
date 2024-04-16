@@ -119,11 +119,11 @@
         }
     ?> 
     <script>
+        // вставка
         let categoryName = document.querySelectorAll(".category-name");
-        let categoryDetails = document.querySelectorAll(".category-details");
         categoryName.forEach((el, index) => {
             el.onclick = () => {
-                categoryDetails[index].classList.toggle("category-details-up");
+                el.nextElementSibling.classList.toggle("category-details-up");
             };
         });
         function setAllIndicator(o) {
@@ -134,7 +134,7 @@
                 }
             });
         };
-        
+        // конец вставки
         
         function setAll(o) {
             v =o.checked;
