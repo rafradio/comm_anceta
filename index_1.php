@@ -134,6 +134,7 @@
         <script>
             let button = document.getElementById("form-submit");
             let data = document.querySelectorAll(".new-dates");
+            let revData = document.querySelectorAll(".new-closed-dates");
             window.onload = function() {
                     setTimeout(() => {
                         document.getElementById("query_result").innerHTML = "";
@@ -146,45 +147,87 @@
                 form.action = "";
                 form.setAttribute("class", "form-class");
                 let counter = true;
+                let checked = true;
+                let revChecking = true;
+                let rowCounter = [];
                 for (var i = 0; i < data.length-1; i += 2) {
                     if (data[i].value != "" && data[i+1].value == "") {
                         counter = false;
+                        break;
                     }
                     if (data[i].value == "" && data[i+1].value != "") {
                         counter = false;
+                        break;
+                    }
+                    if (data[i+1].value < data[i].value) {
+                            checked = false;
+                            break;
+                    } else {
+                        if (data[i].value != "" && data[i+1].value != "") {
+                            rowCounter.push(i);
+                        }
                     }
                 }
-                let checked = true;
-                for (var i = 0; i < data.length-1; i += 2) {
-                    if (data[i+1].value < data[i].value) {checked = false;}
-                }
+                Array.from({ length: revData.length }, (_, i) => {
+                    if (!(/^[0-9\,\s]*$|^\NULL$/.test(revData[i].value))) {
+                        revChecking = false;
+                    }
+                });
                 
-                if (counter && checked) {
-                    console.log(counter, checked);
+                if (counter && checked && revChecking) {
+                    
+                    console.log(counter, checked, revChecking);
+                    console.log(rowCounter);
+                    Array.from({ length: revData.length }, (_, i) => {
+                        if (revData[i].value != "") {
+                            let name = table.rows[i+1].cells[0].textContent+"r";
+                            console.log(name);
+                            let inputForm = document.createElement("input");
+                            inputForm.setAttribute("type", "text");
+                            inputForm.setAttribute("id", "input_r_"+i);
+                            inputForm.setAttribute("name", name);
+                            inputForm.setAttribute("value", revData[i].value);
+                            form.appendChild(inputForm);
+                        }
+                    });
+                    Array.from({ length: data.length }, (_, i) => {
+                        if (rowCounter.includes(i)) {
+                            console.log(i/2+1);
+                            let name = table.rows[i/2+1].cells[0].textContent+"c";
+                            console.log(name);
+                            let myDate = new Date(data[i].value);
+                            let myDate1 = new Date(data[i+1].value);
+                            let inputValue = "с " + myDate.getDate() + "." + (myDate.getMonth()+1).toString();
+                            inputValue += " по " + myDate1.getDate() + "." + (myDate1.getMonth()+1).toString();
+                            let inputForm = document.createElement("input");
+                            inputForm.setAttribute("type", "text");
+                            inputForm.setAttribute("id", "input_c_"+i);
+                            inputForm.setAttribute("name", name);
+                            inputForm.setAttribute("value", inputValue);
+                            console.log(inputValue);
+                            form.appendChild(inputForm);
+                        }
+
+                    });
+//                    for (let i = 0, row; row = table.rows[i]; i++) {
+//                        if (rowCounter.includes((i-1)*2)) {
+//                            if (row.cells[0].nodeName != 'TH') {
+//                                let inputForm = document.createElement("input");
+//                                inputForm.setAttribute("type", "text");
+//                                inputForm.setAttribute("id", "sap_"+i);
+//                                inputForm.setAttribute("name", "sap_"+i);
+//                                inputForm.setAttribute("value", row.cells[0].textContent);
+//                                form.appendChild(inputForm);
+//                                console.log(row.cells[0].textContent);
+//                            }
+//                        }
+//
+//                    }
                 } else {
                     document.getElementById("form-checking").innerHTML = "Проверьте данные";
                     setTimeout(() => {
                         document.getElementById("form-checking").innerHTML = "";
                     }, 2000);
-                }
-                Array.from({ length: data.length }, (_, i) => {
-                    let inputForm = document.createElement("input");
-                    inputForm.setAttribute("type", "text");
-                    inputForm.setAttribute("id", "input_"+i);
-                    inputForm.setAttribute("name", "input_"+i);
-                    inputForm.setAttribute("value", data[i].value);
-                    form.appendChild(inputForm);
-                });
-                for (let i = 0, row; row = table.rows[i]; i++) {
-                    if (row.cells[0].nodeName != 'TH') {
-                        let inputForm = document.createElement("input");
-                        inputForm.setAttribute("type", "text");
-                        inputForm.setAttribute("id", "sap_"+i);
-                        inputForm.setAttribute("name", "sap_"+i);
-                        inputForm.setAttribute("value", row.cells[0].textContent);
-                        form.appendChild(inputForm);
-                    }
-                    
                 }
             
                 document.body.appendChild(form);
