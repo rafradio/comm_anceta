@@ -66,21 +66,7 @@
             $myDate = '';
             $myCount = '';
             $mySap = '';
-            require_once ('DrawMethod.php');
-            if ($_SERVER['REQUEST_METHOD'] == "POST") {
-                    $myData = $_POST['input_2'];
-                    $date = DateTimeImmutable::createFromFormat('Y-m-d', $myData);
-                    $mySap = $_POST['sap_2'];
-//                    $myData = new DateTimeImmutable($_POST['input_2']);
-                    $myDate = $date->format('d.m');
-                    $myCount = count($_POST);
-            }
-//            if (isset($_POST['input_2'])) {
-//                if ($_SERVER['REQUEST_METHOD'] == "POST") {
-//                    $myData = $_POST['input_2'];
-//                    $myCount = count($_POST);
-//                }
-//            }
+            $myStatus = '';
             $dataDB = [];
             $input = fopen("config.txt", "r");
             while(!feof($input)) { 
@@ -92,10 +78,30 @@
             $dbname = $dataDB[3];
             $conn = new mysqli($servername, $username, $password, $dbname);
             $conn->set_charset('utf8');
+            require_once ('DrawMethod.php');
+            if ($_SERVER['REQUEST_METHOD'] == "POST") {
+                insertIntoDB($_POST, $conn);
+                $myStatus = 'Данные обновлены';
+//                    $myData = $_POST['input_2'];
+//                    $date = DateTimeImmutable::createFromFormat('Y-m-d', $myData);
+//                    $mySap = $_POST['sap_2'];
+//                    $myData = new DateTimeImmutable($_POST['input_2']);
+//                    $myDate = $date->format('d.m');
+//                    $myCount = count($_POST);
+            } else {
+                $myStatus = '';
+            }
+//            if (isset($_POST['input_2'])) {
+//                if ($_SERVER['REQUEST_METHOD'] == "POST") {
+//                    $myData = $_POST['input_2'];
+//                    $myCount = count($_POST);
+//                }
+//            }
+            
             
 
             $result = get_outlets($conn, 48009);
-            echo drawOutletList($result,'id_outlet', 'none', true);
+            echo drawOutletList($result, 'id_outlet', $myStatus, 'none', true);
 
 //            echo "Hello wolrd " . $dbname . $result[6]["name"];
             $conn->close();
@@ -209,20 +215,8 @@
                         }
 
                     });
-//                    for (let i = 0, row; row = table.rows[i]; i++) {
-//                        if (rowCounter.includes((i-1)*2)) {
-//                            if (row.cells[0].nodeName != 'TH') {
-//                                let inputForm = document.createElement("input");
-//                                inputForm.setAttribute("type", "text");
-//                                inputForm.setAttribute("id", "sap_"+i);
-//                                inputForm.setAttribute("name", "sap_"+i);
-//                                inputForm.setAttribute("value", row.cells[0].textContent);
-//                                form.appendChild(inputForm);
-//                                console.log(row.cells[0].textContent);
-//                            }
-//                        }
-//
-//                    }
+                    document.body.appendChild(form);
+                    form.submit();
                 } else {
                     document.getElementById("form-checking").innerHTML = "Проверьте данные";
                     setTimeout(() => {
@@ -230,8 +224,7 @@
                     }, 2000);
                 }
             
-                document.body.appendChild(form);
-//                form.submit();
+                
             };
             
         </script>
