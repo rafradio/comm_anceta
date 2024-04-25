@@ -1,5 +1,5 @@
 <?php
-    function drawOutletList($rows, $_label, $title ='', $expose_on_start = false) {
+    function drawOutletList($rows, $_label, $myStatus , $title ='', $expose_on_start = false) {
         $_counter = '<b>(' . count($rows ) . ')</b>';
         $expose_on_start = ($expose_on_start===false) ? 'none;' : '';
         $r = '
@@ -11,7 +11,7 @@
         $r .='    <div style="padding:5px; border:0px; margin-top:5px; display: ' . $expose_on_start  . '" class="hidden_links" >  ' . $title . '
 
             <span id="' . $_label  . '_counter">' . $_counter . '</span>
-            <p id="query_result">Данные обновлены</p>
+            <p id="query_result" style="color:blue;">' . $myStatus . '</p>
             </div>
 
 
@@ -56,6 +56,19 @@
         $r .= '<button id="form-submit" style="margin-right: 20px;">Обновить даты</button>';
         $r .= '<span id="form-checking" style="color: red;"></span>';
         return $r;
+    }
+    function insertIntoDB($data, $conn) {
+        foreach ($data AS $key => $value) {
+            $indicator = substr($key, -1);
+            $shopID = substr($key, 0, -1);
+            if ($indicator == "c") {
+                $q = 'INSERT INTO magnit._test_date_updates (shop_id, closed_dates) VALUES ("'. $shopID . '","' . $value . '");';
+                $result = $conn->query($q);
+            } else {
+                $q = 'INSERT INTO magnit._test_date_updates (shop_id, revision_dates) VALUES ("'. $shopID . '","' . $value . '");';
+                $result = $conn->query($q);
+            }
+        }
     }
 ?>
 
