@@ -54,6 +54,12 @@
                 margin: 5px;
                 cursor: pointer;
             }
+            .active-color {
+                color-scheme: dark;
+            }
+            .normal-color {
+                color-scheme: light;
+            }
         </style>
     </head>
     <body>
@@ -141,6 +147,15 @@
             let button = document.getElementById("form-submit");
             let data = document.querySelectorAll(".new-dates");
             let revData = document.querySelectorAll(".new-closed-dates");
+            Array.from([...data, ...revData]).forEach(el => {
+                    el.onchange = function(){
+                        if (el.value == '') {
+                            el.classList.add("normal-color");
+                        } else {
+                            el.classList.add("active-color");
+                        }
+                    }
+            });
             window.onload = function() {
                     setTimeout(() => {
                         document.getElementById("query_result").innerHTML = "";
