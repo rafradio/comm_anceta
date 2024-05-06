@@ -172,25 +172,30 @@
                 let revChecking = true;
                 let rowCounter = [];
                 for (var i = 0; i < data.length-1; i += 2) {
-                    if (data[i].value != "" && data[i+1].value == "") {
+                    checkArr = [data[i].value, data[i+1].value];
+                    if (checkArr.some((x) => x == "")) {
                         counter = false;
                         break;
                     }
-                    if (data[i].value == "" && data[i+1].value != "") {
-                        counter = false;
-                        break;
-                    }
+//                    if (data[i].value != "" && data[i+1].value == "") {
+//                        counter = false;
+//                        break;
+//                    }
+//                    if (data[i].value == "" && data[i+1].value != "") {
+//                        counter = false;
+//                        break;
+//                    }
                     if (data[i+1].value < data[i].value) {
                             checked = false;
                             break;
                     } else {
-                        if (data[i].value != "" && data[i+1].value != "") {
+                        if (checkArr.every((x) => x != "")) {
                             rowCounter.push(i);
                         }
                     }
                 }
                 Array.from({ length: revData.length }, (_, i) => {
-                    if (!(/^[0-9\,\s]*$|^\NULL$/.test(revData[i].value))) {
+                    if (!(/^[0-9\,\.\s]*$|^\NULL$/.test(revData[i].value))) {
                         revChecking = false;
                     }
                 });
