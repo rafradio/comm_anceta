@@ -18,7 +18,8 @@
             $dbname = $dataDB[3];
             $conn = new mysqli($servername, $username, $password, $dbname);
             $conn->set_charset('utf8');
-            $task_id = "2436352";
+//            $task_id = "2437376 2441733";
+            $task_id = "2437376";
             $qaz="SELECT user_task.*,  location.address as loc_adress , q_nair.name as qnair_name FROM user_task 
                         LEFT JOIN location ON location.id=user_task.location_id 
                         join questionnaire as q_nair on q_nair.id = user_task.parent_questionnaire_id
@@ -43,7 +44,7 @@
             echo "<span style='font-size:20px;'>Анкета № <b>$task_id</b></span><br><br>";
             echo "<span style='font-size:25px;'>Адрес: <b>".$loc_adress."</b></span><br><br><br>";
             echo "<span style='font-size:25px;'>Тип анкеты: <b>".$qnair_name."</b></span><br><br><br>";
-            echo "<span style='font-size:25px;'>Максимальная оценка анкеты: <b id='for-max-score'></b></span><br><br><br>";
+            echo "<span style='font-size:25px;'>Максимальная оценка анкеты: <b id='for-max-score'><span class='loader'></span></b></span><br><br><br>";
             $for_correct="";
             $sub_section_name="";
             $section_name="";
@@ -448,12 +449,12 @@ question.name_eng,
                             }  
                         });
                         
-                        let max = arr.reduce(function(a, b) {
-                                return Math.max(a, b);
+                        let max = arr.reduce(function(total, num) {
+                                return total + num;
                             });
                         let insertBlock = "maxscore_" + index;
                         document.getElementById(insertBlock).innerHTML = "maxsore = " + max;
-                        anketaMax = max > anketaMax ? max: anketaMax;
+                        anketaMax += max;
                     }
 
                     index += 1;
