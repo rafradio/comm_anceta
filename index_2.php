@@ -453,7 +453,7 @@ question.name_eng,
                                 return total + num;
                             });
                         let insertBlock = "maxscore_" + index;
-                        document.getElementById(insertBlock).innerHTML = "maxsore = " + max;
+                        document.getElementById(insertBlock).innerHTML = "Общий бал = " + max;
                         anketaMax += max;
                     }
 
