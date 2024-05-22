@@ -43,6 +43,7 @@
             echo "<span style='font-size:20px;'>Анкета № <b>$task_id</b></span><br><br>";
             echo "<span style='font-size:25px;'>Адрес: <b>".$loc_adress."</b></span><br><br><br>";
             echo "<span style='font-size:25px;'>Тип анкеты: <b>".$qnair_name."</b></span><br><br><br>";
+            echo "<span style='font-size:25px;'>Максимальная оценка анкеты: <b id='for-max-score'></b></span><br><br><br>";
             $for_correct="";
             $sub_section_name="";
             $section_name="";
@@ -176,7 +177,7 @@ question.name_eng,
                         
 //                        echo "<div class='answer-style'>" . $q_text_block . "</div>";
                         echo $q_text_block;
-                        $text_v_s = "<table>";
+                        $text_v_s = "";
 		$text_v="";
 	
 			
@@ -185,13 +186,14 @@ question.name_eng,
 		from user_answer_set
 # f_auditor
 		where question_set_id=".$row["id"]." ORDER BY sorting, parent_answer_id";
-                
+                $insideChapter = false;
                 if ($row["is_answer_multiple_select"]==0) {
 //if (geh()) pre($query_v);
 // GEH Оформление ответов ДА НЕТ
 		
 //		$result_v=mysql_log_query($query_v);
                     $text_score = "";
+                    
                     $result_v = $conn->query($query_v);
 			while($row_v = $result_v->fetch_assoc())
 		  {
@@ -244,16 +246,20 @@ question.name_eng,
 			  //$text_v.="<label><input ".$ch_label." onclick='var dfg=$(\"input[name=add_radio_".$row["id"]."]:checked\").val(); add_user_answer({user_id:".$row["user_id"].",task_id:".$task_id.",qid:".$row["id"].",answer_set_id:dfg, type:\"radio\"});' type='radio' value='".$row_v["id"]."' name='add_radio_".$row["id"]."'/>".$row_v["text"]."</label><br>";
 			  
 			  
-			  $text_v.="<input Q='5657' ".$ch_label." onclick='var dfg=$(\"input[name=add_radio_".$row["id"]."]:checked\").val(); add_user_answer({user_id:".$row["user_id"].",task_id:".$task_id.",qid:".$row["id"].",answer_set_id:dfg, type:\"radio\"});'  id='add_radio_".$row_v["id"]."' type='radio' ".$radio_class."  value='".$row_v["id"]."' name='add_radio_".$row["id"]."'/>".$text_dop.$label_dop.$default_br;
+			  $text_v ="<input Q='5657' ".$ch_label." onclick='var dfg=$(\"input[name=add_radio_".$row["id"]."]:checked\").val(); add_user_answer({user_id:".$row["user_id"].",task_id:".$task_id.",qid:".$row["id"].",answer_set_id:dfg, type:\"radio\"});'  id='add_radio_".$row_v["id"]."' type='radio' ".$radio_class."  value='".$row_v["id"]."' name='add_radio_".$row["id"]."'/>".$text_dop.$label_dop.$default_br;
 //			  $text_v.="<input          ".$ch_label." onclick='var dfg=$(\"input[name=add_radio_".$row["id"]."]:checked\").val(); add_user_answer({user_id:".$row["user_id"].",task_id:".$task_id.",qid:".$row["id"].",answer_set_id:dfg, type:\"radio\"});'  id='add_radio_".$row_v["id"]."' type='radio' ".$radio_class."  value='".$row_v["id"]."' name='add_radio_".$row["id"]."'/>".$label_dop.$default_br;
 			  
                           $text_v_s .= "<td>".$text_v."</td>";
-                  $text_score .= "<p>" . $row_v["score"] . "</p>";
-                  $text_v_s .= "<td>".$text_score."</td></tr>";
+                  $text_score = "<p>" . $row_v["score"] . "</p>";
+                  $hide = "<p>" . $row_v["question_id_to_hide"] . "</p>";
+                  $show = "<p>" . $row_v["question_id_to_show"] . "</p>";
+                  $text_v_s .= "<td>".$text_score."</td>";
+                  $text_v_s .= "<td>".$hide."</td>";
+                  $text_v_s .= "<td>".$show."</td></tr>";
 			  
 		  }
-                 
-                  $text_v_s .= "</table>";
+                  $insideChapter = true;
+                  $text_v_s = "<table>". $text_v_s ."</table>";
                  
 //                  $text_v = $text_v_s;
 		
@@ -272,7 +278,7 @@ question.name_eng,
 		$result_v = $conn->query($query_v);
 			while($row_v = $result_v->fetch_assoc())
 		  {
-                            $text_v_s .= "<tr>";
+//                            $text_v_s .= "<tr>";
 			  
 			    $ch_label="";
 			  
@@ -307,7 +313,7 @@ question.name_eng,
 			  
 			  $text_v.="<label><input Q='5712' ".$ch_label." onclick='var dfg=GetMultiChecked(".$row["id"]."); add_user_answer({user_id:".$row["user_id"].",task_id:".$task_id.",qid:".$row["id"].",val:dfg, type:\"checkbox\"});' id='multiselect_".$row_v["id"]."' type='checkbox'  name='multi_select_".$row["id"]."'/>".$row_v["text"]."</label><br>";
 		  
-                          $text_v_s .= "<td>".$text_v."</td>";
+//                          $text_v_s .= "<td>".$text_v."</td>";
                       }
 	
 		
@@ -386,16 +392,31 @@ question.name_eng,
                        
                             
                             if ($sectionCheck == 0) {
-                                echo "<div style='clear:both; display:block;' class='answer-style' id='add".$row["id"]."'>".$text_v."</div>";
-                                echo "<div class='score-style'>".$text_score."</div>";
+//                                echo "<div style='clear:both; display:block;' class='answer-style' id='add".$row["id"]."'>".$text_v."</div>";
+                                if ($insideChapter) {
+                                    if ($sectionNumber == 0) {
+                                        echo "<div class='score-style'>". $text_v_s ."</div>";
+                                    } else {
+                                        echo "<div class='answer-style'>". $text_v_s ."</div>";
+                                    }
+                                } else {
+                                    echo "<div style='clear:both; display:block;' class='answer-style' id='add".$row["id"]."'>".$text_v."</div>";
+                                }
+//                                echo "<div class='score-style'>". $text_v_s ."</div>";
+//                                echo "<div class='score-style'>".$text_score."</div>";
     //                        echo "<div class='flex-answers' id='add".$row["id"]."'>".$text_v."</div>";
-                            echo "<div style='clear:both; height:10px;'></div>";
-                            echo "<div class='answer-style' id='score_". $sectionNumber ."'>" . $row["max_score"] . "</div>";
+//                            echo "<div style='clear:both; height:10px;'></div>";
+                            echo "<div class='answer-style score_". $sectionNumber ."'>" . $row["max_score"] . "</div>";
+                            echo "<div class='score-style'>" . $row["parent_question_id"] . "</div>";
                             }
                             
                             if ($sectionCheck == 1) {
-                                echo "<div class='score-style'><p id='maxscore_". $sectionNumber ."'>max-score: </p></div>";
+                                echo "<div class='score-style'><p class='maxscore' id='maxscore_". $sectionNumber ."'>max-score: </p></div>";
                             }
+                            
+//                            if ($sectionCheck == 0) {
+//                                echo "<div class='score-style'>". $text_v_s ."</div>";
+//                            }
                             echo "<div class='score-style'>". $additional . "</div></div></div>";
 //                            $text_v = "";
                   
@@ -408,7 +429,40 @@ question.name_eng,
             
         ?>
         <script>
-            
+            let index = 1;
+            let flagFloop = true;
+            let anketaMax = 0;
+            while (flagFloop) {
+                let maxScoreId = "section_" + index.toString();
+                let block = document.getElementById(maxScoreId);
+                
+                if (block != null) {
+                    let classScore = ".score_" + index;
+                    let newProjectData = document.querySelectorAll(classScore);
+                    if (newProjectData.length > 0) {
+                        let arr = Array.from(newProjectData, (el) => {
+                            if (el.innerHTML != "") {
+                                return parseFloat(el.innerHTML);
+                            } else {
+                                return 0;
+                            }  
+                        });
+                        
+                        let max = arr.reduce(function(a, b) {
+                                return Math.max(a, b);
+                            });
+                        let insertBlock = "maxscore_" + index;
+                        document.getElementById(insertBlock).innerHTML = "maxsore = " + max;
+                        anketaMax = max > anketaMax ? max: anketaMax;
+                    }
+
+                    index += 1;
+                    
+                } else {
+                    flagFloop = false;
+                }
+            }
+            document.getElementById('for-max-score').innerHTML = anketaMax;
         </script>
     </body>
 </html>
